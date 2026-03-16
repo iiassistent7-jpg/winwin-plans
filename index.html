@@ -54,7 +54,7 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
   <div class="hero">
     <h1>Тарифы Win-Win</h1>
     <p>Выбери план — и вперёд!</p>
-    <div class="cur-row">
+    <div class="cur-row" id="cur-row">
       <button class="cur-btn active" onclick="setCur('ILS')">₪ ILS</button>
       <button class="cur-btn" onclick="setCur('USD')">$ USD</button>
     </div>
@@ -134,10 +134,69 @@ const PL={1:'в месяц',6:'итого за 6 мес',12:'итого за г�
 const SAVE={ILS:{6:17,12:29},USD:{6:20,12:31}};
 let cur='ILS',per=1;
 
-// Определяем язык из Telegram
+// Определяем язык и страну из Telegram
+let userLang = 'ru';
+let isIsraeli = false;
 if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-  const lang = tg.initDataUnsafe.user.language_code;
-  if (lang !== 'ru') cur = 'USD';
+  userLang = tg.initDataUnsafe.user.language_code || 'ru';
+  // Израильтяне: язык he или номер +972 — только шекели
+  isIsraeli = (userLang === 'he');
+  if (isIsraeli) {
+    cur = 'ILS';
+    // Скрываем переключатель валют
+    const curRow = document.getElementById('cur-row');
+    if (curRow) curRow.style.display = 'none';
+  } else if (userLang !== 'ru') {
+    cur = 'USD';
+  }
+}
+
+// Тексты "Скопировать" на 4 языках
+const COPY_TEXT = {
+  ru: 'Скопировать номер',
+  he: 'העתק מספר',
+  en: 'Copy number',
+  ar: 'نسخ الرقم',
+};
+const COPIED_TEXT = {
+  ru: 'Скопировано!',
+  he: 'הועתק!',
+  en: 'Copied!',
+  ar: 'تم النسخ!',
+};
+const BIT_LABEL = {
+  ru: 'Оплатить через Bit',
+  he: 'לשלם דרך Bit',
+  en: 'Pay via Bit',
+  ar: 'الدفع عبر Bit',
+};
+const PP_LABEL = {
+  ru: 'Оплатить через PayPal',
+  he: 'לשלם דרך PayPal',
+  en: 'Pay via PayPal',
+  ar: 'الدفع عبر PayPal',
+};
+
+const BIT_NUMBER = '053-924-0508';
+const PP_URL = 'https://paypal.me/istudio3377';
+
+function copyBitNumber(btn) {
+  navigator.clipboard.writeText('0539240508').then(() => {
+    const orig = btn.textContent;
+    btn.textContent = (COPIED_TEXT[userLang] || COPIED_TEXT.en);
+    setTimeout(() => btn.textContent = orig, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = '0539240508';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    const orig = btn.textContent;
+    btn.textContent = (COPIED_TEXT[userLang] || COPIED_TEXT.en);
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
 }
 
 function renderBtns(id, plan) {
@@ -147,20 +206,31 @@ function renderBtns(id, plan) {
   const sym = SYM[cur];
   const period = per === 1 ? '1 месяц' : per === 6 ? '6 месяцев' : '12 месяцев';
 
-  // PayPal ссылка с суммой
-  const ppAmount = cur === 'ILS' ? (price * 0.27).toFixed(0) : price; // конвертация в USD для PayPal если ILS
-  const ppUrl = `https://www.paypal.com/paypalme/istudio3377/${ppAmount}USD`;
+  // PayPal ссылка с суммой в USD
+  const ppAmount = cur === 'ILS' ? Math.round(price * 0.27) : price;
+  const ppUrl = `${PP_URL}/${ppAmount}USD`;
+  const copyLabel = COPY_TEXT[userLang] || COPY_TEXT.en;
 
   if (cur === 'ILS') {
+    // Израиль: Bit (показать номер + скопировать) + PayPal
     el.innerHTML = `
-      <button class="pay-btn green" onclick="payBit('${plan}','${period}','${sym}${price}')">📱 Bit</button>
-      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none">
-        <button class="pay-btn blue" style="width:100%" onclick="notifyPP('${plan}','${period}','${sym}${price}')">PayPal</button>
+      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+        <button class="pay-btn green" onclick="payBit('${plan}','${period}','${sym}${price}')" style="font-size:12px">
+          📱 ${BIT_LABEL[userLang] || BIT_LABEL.en}
+        </button>
+        <div style="background:#f0faf5;border:1px solid #1D9E75;border-radius:8px;padding:8px 10px;text-align:center">
+          <div style="font-size:16px;font-weight:700;letter-spacing:1px;color:#0F6E56">${BIT_NUMBER}</div>
+          <button onclick="copyBitNumber(this)" style="margin-top:4px;background:none;border:1px solid #1D9E75;color:#0F6E56;border-radius:6px;padding:3px 12px;font-size:11px;cursor:pointer">${copyLabel}</button>
+        </div>
+      </div>
+      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none" onclick="notifyPP('${plan}','${period}','${sym}${price}')">
+        <button class="pay-btn blue" style="width:100%;height:100%;min-height:44px">${PP_LABEL[userLang] || PP_LABEL.en}</button>
       </a>`;
   } else {
+    // Не Израиль: только PayPal
     el.innerHTML = `
-      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none">
-        <button class="pay-btn blue" style="width:100%" onclick="notifyPP('${plan}','${period}','${sym}${price}')">Оплатить через PayPal</button>
+      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none" onclick="notifyPP('${plan}','${period}','${sym}${price}')">
+        <button class="pay-btn blue" style="width:100%">${PP_LABEL[userLang] || PP_LABEL.en}</button>
       </a>`;
   }
 }
@@ -176,8 +246,8 @@ function render() {
   renderBtns('std-btns', 'STANDARD');
   renderBtns('pro-btns', 'PRO');
   document.getElementById('pay-note').innerHTML = cur === 'ILS'
-    ? '<strong>Bit</strong> +972539240508 &nbsp;·&nbsp; <strong>PayPal</strong> istudio3377@gmail.com<br>После оплаты подписка активируется в течение часа'
-    : '<strong>PayPal</strong> istudio3377@gmail.com<br>После оплаты подписка активируется в течение часа';
+    ? '<strong>Bit</strong> 053-924-0508 &nbsp;·&nbsp; <strong>PayPal</strong> paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа'
+    : '<strong>PayPal</strong> paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа';
 }
 
 function setCur(c) {
