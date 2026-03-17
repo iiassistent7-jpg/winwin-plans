@@ -249,8 +249,41 @@ function setPer(p) {
 }
 
 function notifyBot(plan, period, price, method) {
-  if (tg) tg.sendData(JSON.stringify({action:'pay_intent', plan, period, price, method}));
+  launchCoins();
+  setTimeout(() => {
+    if (tg) tg.sendData(JSON.stringify({action:'pay_intent', plan, period, price, method}));
+  }, 800);
 }
+
+function launchCoins() {
+  const coins = ['🪙','💰','💵','🤑','✨','⭐'];
+  for (let i = 0; i < 28; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.textContent = coins[Math.floor(Math.random() * coins.length)];
+      el.style.cssText = `
+        position:fixed;
+        left:${Math.random()*100}vw;
+        top:-40px;
+        font-size:${20 + Math.random()*18}px;
+        z-index:9999;
+        pointer-events:none;
+        animation:coinFall ${1.2 + Math.random()*1.2}s ease-in forwards;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }, i * 60);
+  }
+}
+
+const coinStyle = document.createElement('style');
+coinStyle.textContent = `
+@keyframes coinFall {
+  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity:1; }
+  80%  { opacity:1; }
+  100% { transform: translateY(105vh) rotate(${Math.random()>0.5?'':'-'}720deg) scale(0.6); opacity:0; }
+}`;
+document.head.appendChild(coinStyle);
 
 render();
 </script>
