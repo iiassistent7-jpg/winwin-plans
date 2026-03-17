@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="he">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Тарифы Win-Win</title>
+<title>Tарифы Win-Win</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -12,9 +12,6 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
 .hero{background:linear-gradient(135deg,#185FA5 0%,#1D9E75 100%);border-radius:0 0 28px 28px;padding:28px 20px;text-align:center;margin-bottom:18px}
 .hero h1{font-size:22px;font-weight:500;color:#fff}
 .hero p{font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px}
-.cur-row{display:flex;gap:8px;justify-content:center;margin-top:16px}
-.cur-btn{border:1px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);padding:8px 20px;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;color:rgba(255,255,255,0.9);transition:.15s}
-.cur-btn.active{background:rgba(255,255,255,0.95);color:#185FA5}
 .body{padding:0 14px 20px}
 .period-row{display:flex;gap:6px;margin-bottom:18px}
 .per-btn{flex:1;border:0.5px solid #ddd;background:#fff;padding:9px 4px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;color:#888;transition:.15s;text-align:center;line-height:1.4}
@@ -47,6 +44,9 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
 .pay-btn.blue{background:#185FA5;border-color:#185FA5;color:#fff}
 .note{font-size:11px;color:#aaa;text-align:center;margin-top:16px;line-height:1.6;padding:0 8px}
 .note strong{color:#888}
+.bit-box{background:#f0faf5;border:1px solid #1D9E75;border-radius:8px;padding:8px 10px;text-align:center;margin-top:6px}
+.bit-num{font-size:18px;font-weight:700;letter-spacing:1px;color:#0F6E56}
+.copy-btn{margin-top:4px;background:none;border:1px solid #1D9E75;color:#0F6E56;border-radius:6px;padding:3px 12px;font-size:11px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -54,17 +54,13 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
   <div class="hero">
     <h1>Тарифы Win-Win</h1>
     <p>Выбери план — и вперёд!</p>
-    <div class="cur-row" id="cur-row">
-      <button class="cur-btn active" onclick="setCur('ILS')">₪ ILS</button>
-      <button class="cur-btn" onclick="setCur('USD')">$ USD</button>
-    </div>
   </div>
 
   <div class="body">
     <div class="period-row">
       <button class="per-btn active" onclick="setPer(1)">1 мес</button>
-      <button class="per-btn" onclick="setPer(6)">6 мес<br><span class="save-pill" id="s6">−17%</span></button>
-      <button class="per-btn" onclick="setPer(12)">12 мес<br><span class="save-pill" id="s12">−29%</span></button>
+      <button class="per-btn" onclick="setPer(6)">6 мес<br><span class="save-pill" id="s6"></span></button>
+      <button class="per-btn" onclick="setPer(12)">12 мес<br><span class="save-pill" id="s12"></span></button>
     </div>
 
     <div class="start-card">
@@ -83,8 +79,8 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
             <span class="plan-badge badge-std">Популярный выбор</span>
           </div>
           <div class="price-right">
-            <div class="price-num" id="std-p">99₪</div>
-            <div class="price-period" id="std-sub">в месяц</div>
+            <div class="price-num" id="std-p"></div>
+            <div class="price-period" id="std-sub"></div>
           </div>
         </div>
         <div class="divider"></div>
@@ -105,8 +101,8 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
             <span class="plan-badge badge-pro">VIP приоритет</span>
           </div>
           <div class="price-right">
-            <div class="price-num" id="pro-p">149₪</div>
-            <div class="price-period" id="pro-sub">в месяц</div>
+            <div class="price-num" id="pro-p"></div>
+            <div class="price-period" id="pro-sub"></div>
           </div>
         </div>
         <div class="divider"></div>
@@ -128,157 +124,132 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
 const tg = window.Telegram && window.Telegram.WebApp;
 if (tg) tg.ready();
 
-const P={ILS:{1:{s:99,p:149},6:{s:499,p:749},12:{s:849,p:1349}},USD:{1:{s:29,p:49},6:{s:139,p:249},12:{s:239,p:449}}};
-const SYM={ILS:'₪',USD:'$'};
-const PL={1:'в месяц',6:'итого за 6 мес',12:'итого за год'};
-const SAVE={ILS:{6:17,12:29},USD:{6:20,12:31}};
-let cur='ILS',per=1;
+// Цены ILS: 1мес / 6мес / 12мес
+const P = {
+  1:  {s: 99,  p: 149},
+  6:  {s: 499, p: 749},
+  12: {s: 849, p: 1349}
+};
+// Скидки в числах
+const SAVE_S = {6: 95,  12: 189};  // экономия STANDARD
+const SAVE_P = {6: 145, 12: 439};  // экономия PRO
+const PL = {1:'в месяц', 6:'итого за 6 мес', 12:'итого за год'};
 
-// Определяем язык и страну из Telegram
-let userLang = 'ru';
-let isIsraeli = false;
-if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-  userLang = tg.initDataUnsafe.user.language_code || 'ru';
-  // Израильтяне: язык he или номер +972 — только шекели
-  isIsraeli = (userLang === 'he');
-  if (isIsraeli) {
-    cur = 'ILS';
-    // Скрываем переключатель валют
-    const curRow = document.getElementById('cur-row');
-    if (curRow) curRow.style.display = 'none';
-  } else if (userLang !== 'ru') {
-    cur = 'USD';
-  }
-}
-
-// Тексты "Скопировать" на 4 языках
-const COPY_TEXT = {
-  ru: 'Скопировать номер',
-  he: 'העתק מספר',
-  en: 'Copy number',
-  ar: 'نسخ الرقم',
-};
-const COPIED_TEXT = {
-  ru: 'Скопировано!',
-  he: 'הועתק!',
-  en: 'Copied!',
-  ar: 'تم النسخ!',
-};
-const BIT_LABEL = {
-  ru: 'Оплатить через Bit',
-  he: 'לשלם דרך Bit',
-  en: 'Pay via Bit',
-  ar: 'الدفع عبر Bit',
-};
-const PP_LABEL = {
-  ru: 'Оплатить через PayPal',
-  he: 'לשלם דרך PayPal',
-  en: 'Pay via PayPal',
-  ar: 'الدفع عبر PayPal',
-};
+let per = 1;
 
 const BIT_NUMBER = '053-924-0508';
-const PP_URL = 'https://paypal.me/istudio3377';
+const BIT_RAW    = '0539240508';
+const PP_URL     = 'https://paypal.me/istudio3377';
+const BIT_DEEPLINK = 'https://bitpay.co.il/app/pay?phone=' + BIT_RAW;
+
+// Определяем язык
+let userLang = 'ru';
+if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+  userLang = tg.initDataUnsafe.user.language_code || 'ru';
+}
+
+const L = {
+  title:   {ru:'Тарифы Win-Win', he:'תעריפי Win-Win', en:'Win-Win Plans', ar:'خطط Win-Win'},
+  sub:     {ru:'Выбери план — и вперёд!', he:'בחרו תוכנית — ויאללה!', en:'Pick a plan and go!', ar:'اختر خطة وانطلق!'},
+  perMon:  {ru:'в месяц', he:'לחודש', en:'per month', ar:'شهريا'},
+  per6:    {ru:'итого за 6 мес', he:'סה"כ ל-6 חודשים', en:'total for 6 mo', ar:'المجموع لـ 6 أشهر'},
+  per12:   {ru:'итого за год', he:'סה"כ לשנה', en:'total for year', ar:'المجموع للسنة'},
+  stdBadge:{ru:'Популярный выбор', he:'הבחירה הפופולרית', en:'Popular choice', ar:'الخيار الشائع'},
+  proBadge:{ru:'VIP приоритет', he:'עדיפות VIP', en:'VIP priority', ar:'أولوية VIP'},
+  startSub:{ru:'первые 10 сделок бесплатно', he:'10 העסקאות הראשונות בחינם', en:'first 10 deals free', ar:'أول 10 صفقات مجانا'},
+  f1:      {ru:'Безлимитные лиды', he:'לידים ללא הגבלה', en:'Unlimited leads', ar:'عملاء غير محدودين'},
+  f2:      {ru:'Персональные QR-коды', he:'קודי QR אישיים', en:'Personal QR codes', ar:'رموز QR شخصية'},
+  f3:      {ru:'Долговая книга агентов', he:'ספר חובות סוכנים', en:'Agent debt book', ar:'دفتر ديون الوكلاء'},
+  f4:      {ru:'Экспорт сделок в CSV', he:'ייצוא עסקאות ל-CSV', en:'Export deals to CSV', ar:'تصدير الصفقات CSV'},
+  f5:      {ru:'Поддержка Винса 24/7', he:'תמיכת וינס 24/7', en:'Vince support 24/7', ar:'دعم فينس 24/7'},
+  fp1:     {ru:'Всё из STANDARD', he:'הכל מ-STANDARD', en:'All from STANDARD', ar:'كل شيء من STANDARD'},
+  fp2:     {ru:'Топ позиции в каталоге', he:'מיקומי טופ בקטלוג', en:'Top catalog positions', ar:'مواقع متصدرة'},
+  fp3:     {ru:'Значок верификации ✅', he:'תג אימות ✅', en:'Verification badge ✅', ar:'شارة التحقق ✅'},
+  fp4:     {ru:'Приоритетная поддержка Винса', he:'תמיכת וינס עדיפה', en:'Priority Vince support', ar:'دعم فينس ذو أولوية'},
+  bitBtn:  {ru:'📱 Оплатить через Bit', he:'📱 לשלם דרך Bit', en:'📱 Pay via Bit', ar:'📱 الدفع عبر Bit'},
+  ppBtn:   {ru:'Оплатить через PayPal', he:'לשלם דרך PayPal', en:'Pay via PayPal', ar:'الدفع عبر PayPal'},
+  copyHint:{ru:'Но сначала скопируйте номер:', he:'אך קודם העתיקו את המספר:', en:'But first copy the number:', ar:'لكن أولاً انسخ الرقم:'},
+  copyBtn: {ru:'Скопировать номер', he:'העתק מספר', en:'Copy number', ar:'نسخ الرقم'},
+  copied:  {ru:'Скопировано!', he:'הועתק!', en:'Copied!', ar:'تم النسخ!'},
+  noteILS: {ru:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа',
+            he:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>לאחר התשלום המנוי יופעל תוך שעה',
+            en:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>Subscription activates within 1 hour after payment',
+            ar:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>يتم تفعيل الاشتراك خلال ساعة بعد الدفع'},
+};
+
+function t(key) { return L[key][userLang] || L[key]['en'] || ''; }
 
 function copyBitNumber(btn) {
-  navigator.clipboard.writeText('0539240508').then(() => {
-    const orig = btn.textContent;
-    btn.textContent = (COPIED_TEXT[userLang] || COPIED_TEXT.en);
+  const copied = t('copied');
+  const orig   = t('copyBtn');
+  navigator.clipboard.writeText(BIT_RAW).then(() => {
+    btn.textContent = copied;
     setTimeout(() => btn.textContent = orig, 2000);
   }).catch(() => {
-    // fallback
     const ta = document.createElement('textarea');
-    ta.value = '0539240508';
+    ta.value = BIT_RAW;
     document.body.appendChild(ta);
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    const orig = btn.textContent;
-    btn.textContent = (COPIED_TEXT[userLang] || COPIED_TEXT.en);
+    btn.textContent = copied;
     setTimeout(() => btn.textContent = orig, 2000);
   });
 }
 
 function renderBtns(id, plan) {
-  const el = document.getElementById(id);
-  const v = P[cur][per];
-  const price = plan === 'STANDARD' ? v.s : v.p;
-  const sym = SYM[cur];
-  const period = per === 1 ? '1 месяц' : per === 6 ? '6 месяцев' : '12 месяцев';
+  const el    = document.getElementById(id);
+  const price = plan === 'STANDARD' ? P[per].s : P[per].p;
+  const label = per === 1 ? '1 мес' : per === 6 ? '6 мес' : '12 мес';
+  const ppUrl = `${PP_URL}/${price}ILS`;
 
-  // PayPal ссылка с суммой в USD
-  const ppAmount = cur === 'ILS' ? Math.round(price * 0.27) : price;
-  const ppUrl = `${PP_URL}/${ppAmount}USD`;
-  const copyLabel = COPY_TEXT[userLang] || COPY_TEXT.en;
-
-  if (cur === 'ILS') {
-    // Израиль: Bit (показать номер + скопировать) + PayPal
-    el.innerHTML = `
-      <div style="flex:1;display:flex;flex-direction:column;gap:6px">
-        <button class="pay-btn green" onclick="payBit('${plan}','${period}','${sym}${price}')" style="font-size:12px">
-          📱 ${BIT_LABEL[userLang] || BIT_LABEL.en}
-        </button>
-        <div style="background:#f0faf5;border:1px solid #1D9E75;border-radius:8px;padding:8px 10px;text-align:center">
-          <div style="font-size:16px;font-weight:700;letter-spacing:1px;color:#0F6E56">${BIT_NUMBER}</div>
-          <button onclick="copyBitNumber(this)" style="margin-top:4px;background:none;border:1px solid #1D9E75;color:#0F6E56;border-radius:6px;padding:3px 12px;font-size:11px;cursor:pointer">${copyLabel}</button>
-        </div>
+  el.innerHTML = `
+    <div style="width:100%;display:flex;flex-direction:column;gap:8px">
+      <a href="${BIT_DEEPLINK}" style="text-decoration:none" onclick="notifyBot('${plan}','${label}','${price}ILS','Bit')">
+        <button class="pay-btn green" style="width:100%">${t('bitBtn')}</button>
+      </a>
+      <div class="bit-box">
+        <div style="font-size:11px;color:#555;margin-bottom:4px">${t('copyHint')}</div>
+        <div class="bit-num">${BIT_NUMBER}</div>
+        <button class="copy-btn" onclick="copyBitNumber(this)">${t('copyBtn')}</button>
       </div>
-      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none" onclick="notifyPP('${plan}','${period}','${sym}${price}')">
-        <button class="pay-btn blue" style="width:100%;height:100%;min-height:44px">${PP_LABEL[userLang] || PP_LABEL.en}</button>
-      </a>`;
-  } else {
-    // Не Израиль: только PayPal
-    el.innerHTML = `
-      <a href="${ppUrl}" target="_blank" style="flex:1;text-decoration:none" onclick="notifyPP('${plan}','${period}','${sym}${price}')">
-        <button class="pay-btn blue" style="width:100%">${PP_LABEL[userLang] || PP_LABEL.en}</button>
-      </a>`;
-  }
+      <a href="${ppUrl}" target="_blank" style="text-decoration:none" onclick="notifyBot('${plan}','${label}','${price}ILS','PayPal')">
+        <button class="pay-btn blue" style="width:100%">${t('ppBtn')}</button>
+      </a>
+    </div>`;
 }
 
 function render() {
-  const s = SYM[cur], v = P[cur][per];
-  document.getElementById('std-p').textContent = s + v.s;
-  document.getElementById('std-sub').textContent = PL[per];
-  document.getElementById('pro-p').textContent = s + v.p;
-  document.getElementById('pro-sub').textContent = PL[per];
-  document.getElementById('s6').textContent = '−' + SAVE[cur][6] + '%';
-  document.getElementById('s12').textContent = '−' + SAVE[cur][12] + '%';
+  document.querySelector('.hero h1').textContent = t('title');
+  document.querySelector('.hero p').textContent  = t('sub');
+
+  const v = P[per];
+  document.getElementById('std-p').textContent   = '₪' + v.s;
+  document.getElementById('std-sub').textContent = per === 1 ? t('perMon') : per === 6 ? t('per6') : t('per12');
+  document.getElementById('pro-p').textContent   = '₪' + v.p;
+  document.getElementById('pro-sub').textContent = per === 1 ? t('perMon') : per === 6 ? t('per6') : t('per12');
+
+  // Скидки в числах (сколько экономишь)
+  if (per > 1) {
+    document.getElementById('s6').textContent  = '-' + SAVE_S[6]  + '₪';
+    document.getElementById('s12').textContent = '-' + SAVE_S[12] + '₪';
+  }
+
   renderBtns('std-btns', 'STANDARD');
   renderBtns('pro-btns', 'PRO');
-  document.getElementById('pay-note').innerHTML = cur === 'ILS'
-    ? '<strong>Bit</strong> 053-924-0508 &nbsp;·&nbsp; <strong>PayPal</strong> paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа'
-    : '<strong>PayPal</strong> paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа';
-}
-
-function setCur(c) {
-  cur = c;
-  document.querySelectorAll('.cur-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.cur-btn')[c === 'ILS' ? 0 : 1].classList.add('active');
-  render();
+  document.getElementById('pay-note').innerHTML = '<strong>' + (t('noteILS')) + '</strong>';
 }
 
 function setPer(p) {
   per = p;
   document.querySelectorAll('.per-btn').forEach((b, i) => {
-    b.classList.remove('active');
-    if (i === {1:0,6:1,12:2}[p]) b.classList.add('active');
+    b.classList.toggle('active', i === {1:0,6:1,12:2}[p]);
   });
   render();
 }
 
-// Bit: отправляем сообщение в бот и закрываем WebApp
-function payBit(plan, period, price) {
-  const msg = `💳 Хочу оплатить ${plan} на ${period} — ${price} через Bit`;
-  if (tg) {
-    tg.sendData(JSON.stringify({action:'pay_intent',plan,period,price,method:'Bit'}));
-  }
-}
-
-// PayPal: открываем ссылку, уведомляем бот через sendData
-function notifyPP(plan, period, price) {
-  if (tg) {
-    tg.sendData(JSON.stringify({action:'pay_intent',plan,period,price,method:'PayPal'}));
-  }
+function notifyBot(plan, period, price, method) {
+  if (tg) tg.sendData(JSON.stringify({action:'pay_intent', plan, period, price, method}));
 }
 
 render();
