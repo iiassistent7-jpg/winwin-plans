@@ -117,6 +117,11 @@ body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#0
     </div>
 
     <div class="note" id="pay-note"></div>
+    <div id="bit-install-msg" style="display:none;margin:12px 14px 0;background:#fff8e1;border:1px solid #f0c040;border-radius:12px;padding:12px 14px;font-size:13px;text-align:center">
+      <div style="font-size:20px;margin-bottom:6px">📱</div>
+      <div id="bit-install-text" style="color:#333;font-weight:500;margin-bottom:8px">Bit не установлен?</div>
+      <a href="https://bit.co.il/download" target="_blank" style="display:inline-block;background:#0F6E56;color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:500;text-decoration:none">Установить Bit</a>
+    </div>
   </div>
 </div>
 
@@ -141,6 +146,7 @@ const BIT_NUMBER = '053-924-0508';
 const BIT_RAW    = '0539240508';
 const PP_URL     = 'https://paypal.me/istudio3377';
 const BIT_DEEPLINK = 'https://bitpay.co.il/app/pay?phone=' + BIT_RAW;
+const BIT_INSTALL_URL = 'https://bit.co.il/download'; // страница установки Bit
 
 // Определяем язык
 let userLang = 'ru';
@@ -205,9 +211,7 @@ function renderBtns(id, plan) {
 
   el.innerHTML = `
     <div style="width:100%;display:flex;flex-direction:column;gap:8px">
-      <a href="${BIT_DEEPLINK}" style="text-decoration:none" onclick="notifyBot('${plan}','${label}','${price}ILS','Bit')">
-        <button class="pay-btn green" style="width:100%">${t('bitBtn')}</button>
-      </a>
+      <button class="pay-btn green" style="width:100%" onclick="openBit('${plan}','${label}','${price}')">${t('bitBtn')}</button>
       <div class="bit-box">
         <div style="font-size:11px;color:#555;margin-bottom:4px">${t('copyHint')}</div>
         <div class="bit-num">${BIT_NUMBER}</div>
@@ -237,6 +241,16 @@ function render() {
 
   renderBtns('std-btns', 'STANDARD');
   renderBtns('pro-btns', 'PRO');
+
+  // Локализуем блок установки Bit
+  const installTexts = {
+    ru: 'Bit не установлен? Скачайте бесплатно:',
+    he: 'Bit לא מותקן? הורידו בחינם:',
+    en: 'Bit not installed? Download free:',
+    ar: 'Bit غير مثبت؟ حمّل مجاناً:'
+  };
+  const installEl = document.getElementById('bit-install-text');
+  if (installEl) installEl.textContent = installTexts[userLang] || installTexts.en;
   document.getElementById('pay-note').innerHTML = '<strong>' + (t('noteILS')) + '</strong>';
 }
 
@@ -246,6 +260,17 @@ function setPer(p) {
     b.classList.toggle('active', i === {1:0,6:1,12:2}[p]);
   });
   render();
+}
+
+function openBit(plan, label, price) {
+  notifyBot(plan, label, price + 'ILS', 'Bit');
+  // Пробуем открыть Bit, если не открылось — предлагаем установить
+  const tryOpen = window.open(BIT_DEEPLINK, '_blank');
+  setTimeout(() => {
+    // Если окно не открылось или пользователь вернулся — показываем кнопку установки
+    const installMsg = document.getElementById('bit-install-msg');
+    if (installMsg) installMsg.style.display = 'block';
+  }, 2000);
 }
 
 function notifyBot(plan, period, price, method) {
