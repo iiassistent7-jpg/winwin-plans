@@ -688,10 +688,21 @@
       document.getElementById("bitInstallTitle").textContent = t("installTitle");
       document.getElementById("bitInstallBtn").textContent   = t("installBtn");
 
-      // Кнопки периодов
+      // Кнопки периодов — скидки видны всегда
       document.getElementById("per1").childNodes[0].textContent  = t("per1");
       document.getElementById("per6").childNodes[0].textContent  = t("per6");
       document.getElementById("per12").childNodes[0].textContent = t("per12");
+
+      // Считаем % скидки для STANDARD (как базовый тариф)
+      const price1  = P[1].s;
+      const price6  = P[6].s;
+      const price12 = P[12].s;
+      const pct6  = Math.round((1 - price6  / (price1 * 6))  * 100);
+      const pct12 = Math.round((1 - price12 / (price1 * 12)) * 100);
+
+      // Всегда показываем скидку на кнопках 6 и 12 мес
+      document.getElementById("s6").textContent  = "-" + SYM + SAV.s[6]  + " · -" + pct6  + "%";
+      document.getElementById("s12").textContent = "-" + SYM + SAV.s[12] + " · -" + pct12 + "%";
 
       const v = P[per];
       const perLbl = per === 1 ? t("perMon") : per === 6 ? t("per6lbl") : t("per12lbl");
@@ -700,15 +711,6 @@
       document.getElementById("stdPeriod").textContent = perLbl;
       document.getElementById("proPrice").textContent  = SYM + v.p;
       document.getElementById("proPeriod").textContent = perLbl;
-
-      // Скидки
-      if (per > 1) {
-        document.getElementById("s6").textContent  = "-" + SYM + SAV.s[6];
-        document.getElementById("s12").textContent = "-" + SYM + SAV.s[12];
-      } else {
-        document.getElementById("s6").textContent  = "";
-        document.getElementById("s12").textContent = "";
-      }
 
       renderFeats();
       renderBtns("stdBtns", "STANDARD");
