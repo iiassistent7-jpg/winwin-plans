@@ -1,316 +1,737 @@
-<!DOCTYPE html>
-<html lang="he">
+<!doctype html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Tарифы Win-Win</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--tg-theme-bg-color,#fff);color:var(--tg-theme-text-color,#000)}
-.wrap{max-width:420px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
-.hero{background:linear-gradient(135deg,#185FA5 0%,#1D9E75 100%);border-radius:0 0 28px 28px;padding:28px 20px;text-align:center;margin-bottom:18px}
-.hero h1{font-size:22px;font-weight:500;color:#fff}
-.hero p{font-size:13px;color:rgba(255,255,255,0.8);margin-top:4px}
-.body{padding:0 14px 20px}
-.period-row{display:flex;gap:6px;margin-bottom:18px}
-.per-btn{flex:1;border:0.5px solid #ddd;background:#fff;padding:9px 4px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;color:#888;transition:.15s;text-align:center;line-height:1.4}
-.per-btn.active{background:#E1F5EE;border-color:#1D9E75;color:#085041}
-.save-pill{display:inline-block;background:#0F6E56;color:#E1F5EE;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:2px;vertical-align:middle}
-.start-card{background:#f8f8f8;border:0.5px solid #e5e5e5;border-radius:16px;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.start-left .name{font-size:14px;font-weight:500;color:#111}
-.start-left .sub{font-size:12px;color:#888;margin-top:2px}
-.start-price{font-size:24px;font-weight:500;color:#111}
-.cards{display:flex;flex-direction:column;gap:12px}
-.card{background:#fff;border:0.5px solid #e5e5e5;border-radius:16px;padding:18px}
-.card.featured{border:2px solid #1D9E75}
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
-.plan-name{font-size:15px;font-weight:500;color:#111}
-.plan-badge{display:inline-block;font-size:10px;font-weight:500;padding:3px 9px;border-radius:10px;margin-top:4px}
-.badge-std{background:#E1F5EE;color:#085041}
-.badge-pro{background:#FAEEDA;color:#633806}
-.price-right{text-align:right}
-.price-num{font-size:28px;font-weight:500;color:#111;line-height:1}
-.price-period{font-size:11px;color:#888;margin-top:3px}
-.divider{height:0.5px;background:#e5e5e5;margin:12px 0}
-.feats{list-style:none;display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
-.feats li{font-size:13px;color:#555;display:flex;align-items:center;gap:8px}
-.dot{width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.dot-std{background:#E1F5EE}
-.dot-pro{background:#E6F1FB}
-.btn-row{display:flex;gap:8px}
-.pay-btn{flex:1;padding:11px 6px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid #ddd;background:#fff;color:#111;transition:.15s;text-align:center}
-.pay-btn.green{background:#0F6E56;border-color:#0F6E56;color:#fff}
-.pay-btn.blue{background:#185FA5;border-color:#185FA5;color:#fff}
-.note{font-size:11px;color:#aaa;text-align:center;margin-top:16px;line-height:1.6;padding:0 8px}
-.note strong{color:#888}
-.bit-box{background:#f0faf5;border:1px solid #1D9E75;border-radius:8px;padding:8px 10px;text-align:center;margin-top:6px}
-.bit-num{font-size:18px;font-weight:700;letter-spacing:1px;color:#0F6E56}
-.copy-btn{margin-top:4px;background:none;border:1px solid #1D9E75;color:#0F6E56;border-radius:6px;padding:3px 12px;font-size:11px;cursor:pointer}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Win-Win Plans</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-1: #0a0a0f;
+      --bg-2: #1a1a2e;
+      --accent-1: #6c63ff;
+      --accent-2: #00d4aa;
+      --text-main: #ffffff;
+      --text-muted: #a0a0b0;
+      --wa: #25d366;
+      --tg: #0088cc;
+      --card: rgba(255,255,255,0.06);
+      --card-border: rgba(255,255,255,0.08);
+      --ease-out: cubic-bezier(0.23,1,0.32,1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      min-height: 100%;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: var(--text-main);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(108,99,255,0.14), transparent 35%),
+        radial-gradient(circle at 80% 10%, rgba(0,212,170,0.12), transparent 30%),
+        linear-gradient(135deg, var(--bg-1), var(--bg-2), #111122, var(--bg-1));
+      background-size: 180% 180%;
+      animation: bgShift 15s ease infinite;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      padding: 16px 14px 24px;
+    }
+
+    body.rtl { direction: rtl; }
+
+    @keyframes bgShift {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 480px;
+      opacity: 0;
+      transform: translateY(12px);
+      animation: pageIn 0.6s var(--ease-out) forwards;
+    }
+
+    @keyframes pageIn { to { opacity:1; transform:translateY(0); } }
+
+    /* ШАПКА */
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .logo-sub {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .page-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 10px;
+    }
+
+    .page-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ПАНЕЛЬ */
+    .panel {
+      position: relative;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 24px;
+      padding: 20px 18px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.28);
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, rgba(108,99,255,0.4), rgba(0,212,170,0.18), rgba(255,255,255,0.05));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+
+    .panel.featured {
+      border-color: rgba(108,99,255,0.45);
+      box-shadow: 0 0 20px rgba(108,99,255,0.18), 0 10px 40px rgba(0,0,0,0.28);
+    }
+
+    /* ПЕРИОДЫ */
+    .period-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .per-btn {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 10px 6px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.4;
+      transition: background 0.18s, border-color 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+
+    .per-btn:hover { border-color: rgba(255,255,255,0.2); }
+
+    .per-btn.active {
+      background: linear-gradient(135deg, rgba(108,99,255,0.3), rgba(0,212,170,0.1));
+      border-color: rgba(108,99,255,0.5);
+      color: var(--text-main);
+      box-shadow: 0 0 10px rgba(108,99,255,0.25);
+    }
+
+    .save-pill {
+      display: inline-block;
+      background: var(--accent-2);
+      color: #04302a;
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 8px;
+      margin-top: 3px;
+    }
+
+    /* START КАРТОЧКА */
+    .start-card {
+      background: var(--card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .start-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent-2);
+    }
+
+    .start-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    .start-price {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    /* ПЛАН КАРТОЧКА */
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .plan-name {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-main);
+    }
+
+    .plan-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 10px;
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-std {
+      background: rgba(0,212,170,0.12);
+      color: var(--accent-2);
+    }
+
+    .badge-pro {
+      background: rgba(108,99,255,0.12);
+      color: #a89fff;
+    }
+
+    .price-right { text-align: right; }
+    body.rtl .price-right { text-align: left; }
+
+    .price-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1;
+    }
+
+    .price-period {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--card-border);
+      margin: 14px 0 16px;
+    }
+
+    /* ФИЧИ */
+    .feats {
+      list-style: none;
+      display: grid;
+      gap: 9px;
+      margin-bottom: 18px;
+    }
+
+    .feats li {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dot-std { background: rgba(0,212,170,0.12); }
+    .dot-pro { background: rgba(108,99,255,0.12); }
+
+    /* КНОПКИ ОПЛАТЫ */
+    .pay-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .pay-btn {
+      appearance: none;
+      border: none;
+      outline: none;
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      min-height: 50px;
+      padding: 13px 18px;
+      border-radius: 999px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), filter 0.2s;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+    }
+
+    .pay-btn:hover  { transform: scale(1.02); filter: brightness(1.04); }
+    .pay-btn:active { transform: scale(0.98); }
+
+    .pay-btn.green { background: linear-gradient(135deg, #22c55e, var(--wa)); }
+    .pay-btn.green:hover { box-shadow: 0 0 0 1px rgba(37,211,102,0.25), 0 8px 24px rgba(37,211,102,0.34); }
+
+    .pay-btn.blue  { background: linear-gradient(135deg, #149adf, var(--tg)); }
+    .pay-btn.blue:hover  { box-shadow: 0 0 0 1px rgba(0,136,204,0.25), 0 8px 24px rgba(0,136,204,0.34); }
+
+    /* BIT BOX */
+    .bit-box {
+      background: rgba(0,212,170,0.06);
+      border: 1px solid rgba(0,212,170,0.18);
+      border-radius: 16px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .bit-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .bit-num {
+      font-size: 1.2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--accent-2);
+    }
+
+    .copy-btn {
+      appearance: none;
+      background: rgba(0,212,170,0.1);
+      border: 1px solid rgba(0,212,170,0.2);
+      color: var(--accent-2);
+      border-radius: 999px;
+      padding: 5px 16px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 7px;
+      transition: background 0.18s;
+    }
+
+    .copy-btn:hover { background: rgba(0,212,170,0.18); }
+
+    /* НОТА */
+    .note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      line-height: 1.7;
+      margin-top: 6px;
+      padding: 0 4px;
+    }
+
+    /* BIT INSTALL */
+    .bit-install {
+      display: none;
+      background: rgba(255,248,225,0.05);
+      border: 1px solid rgba(240,192,64,0.25);
+      border-radius: 18px;
+      padding: 16px;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .bit-install-icon { font-size: 1.5rem; margin-bottom: 8px; }
+
+    .bit-install-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 10px;
+    }
+
+    .install-link {
+      display: inline-block;
+      background: linear-gradient(135deg, #22c55e, var(--wa));
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 22px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      text-decoration: none;
+    }
+  </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="hero">
-    <h1>Тарифы Win-Win</h1>
-    <p>Выбери план — и вперёд!</p>
-  </div>
+  <div class="shell">
 
-  <div class="body">
-    <div class="period-row">
-      <button class="per-btn active" onclick="setPer(1)">1 мес</button>
-      <button class="per-btn" onclick="setPer(6)">6 мес<br><span class="save-pill" id="s6"></span></button>
-      <button class="per-btn" onclick="setPer(12)">12 мес<br><span class="save-pill" id="s12"></span></button>
+    <div class="header">
+      <div class="logo">Win-Win</div>
+      <div class="logo-sub">Network</div>
+      <div class="page-title" id="pageTitle">Win-Win Plans</div>
+      <div class="page-sub" id="pageSub">Pick a plan and go!</div>
     </div>
 
+    <!-- ПЕРИОДЫ -->
+    <div class="period-row">
+      <button class="per-btn active" onclick="setPer(1)" id="per1">1 mo</button>
+      <button class="per-btn" onclick="setPer(6)" id="per6">6 mo<br><span class="save-pill" id="s6"></span></button>
+      <button class="per-btn" onclick="setPer(12)" id="per12">12 mo<br><span class="save-pill" id="s12"></span></button>
+    </div>
+
+    <!-- START -->
     <div class="start-card">
-      <div class="start-left">
-        <div class="name">START</div>
-        <div class="sub">первые 10 сделок бесплатно</div>
+      <div>
+        <div class="start-name">START</div>
+        <div class="start-sub" id="startSub">first 10 deals free</div>
       </div>
       <div class="start-price">0</div>
     </div>
 
-    <div class="cards">
-      <div class="card featured">
-        <div class="card-top">
-          <div>
-            <div class="plan-name">STANDARD</div>
-            <span class="plan-badge badge-std">Популярный выбор</span>
-          </div>
-          <div class="price-right">
-            <div class="price-num" id="std-p"></div>
-            <div class="price-period" id="std-sub"></div>
-          </div>
+    <!-- STANDARD -->
+    <div class="panel featured">
+      <div class="card-top">
+        <div>
+          <div class="plan-name">STANDARD</div>
+          <span class="plan-badge badge-std" id="stdBadge">Popular choice</span>
         </div>
-        <div class="divider"></div>
-        <ul class="feats">
-          <li><span class="dot dot-std"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#0F6E56" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Безлимитные лиды</li>
-          <li><span class="dot dot-std"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#0F6E56" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Персональные QR-коды</li>
-          <li><span class="dot dot-std"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#0F6E56" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Долговая книга агентов</li>
-          <li><span class="dot dot-std"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#0F6E56" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Экспорт сделок в CSV</li>
-          <li><span class="dot dot-std"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#0F6E56" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Поддержка Винса 24/7</li>
-        </ul>
-        <div class="btn-row" id="std-btns"></div>
-      </div>
-
-      <div class="card">
-        <div class="card-top">
-          <div>
-            <div class="plan-name">PRO</div>
-            <span class="plan-badge badge-pro">VIP приоритет</span>
-          </div>
-          <div class="price-right">
-            <div class="price-num" id="pro-p"></div>
-            <div class="price-period" id="pro-sub"></div>
-          </div>
+        <div class="price-right">
+          <div class="price-num" id="stdPrice"></div>
+          <div class="price-period" id="stdPeriod"></div>
         </div>
-        <div class="divider"></div>
-        <ul class="feats">
-          <li><span class="dot dot-pro"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#185FA5" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Всё из STANDARD</li>
-          <li><span class="dot dot-pro"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#185FA5" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Топ позиции в каталоге</li>
-          <li><span class="dot dot-pro"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#185FA5" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Значок верификации ✅</li>
-          <li><span class="dot dot-pro"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="#185FA5" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></span>Приоритетная поддержка Винса</li>
-        </ul>
-        <div class="btn-row" id="pro-btns"></div>
       </div>
+      <div class="divider"></div>
+      <ul class="feats" id="stdFeats"></ul>
+      <div class="pay-wrap" id="stdBtns"></div>
+      <div class="note" id="stdNote"></div>
     </div>
 
-    <div class="note" id="pay-note"></div>
-    <div id="bit-install-msg" style="display:none;margin:12px 14px 0;background:#fff8e1;border:1px solid #f0c040;border-radius:12px;padding:12px 14px;font-size:13px;text-align:center">
-      <div style="font-size:20px;margin-bottom:6px">📱</div>
-      <div id="bit-install-text" style="color:#333;font-weight:500;margin-bottom:8px">Bit не установлен?</div>
-      <a href="https://bit.co.il/download" target="_blank" style="display:inline-block;background:#0F6E56;color:#fff;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:500;text-decoration:none">Установить Bit</a>
+    <!-- PRO -->
+    <div class="panel">
+      <div class="card-top">
+        <div>
+          <div class="plan-name">PRO</div>
+          <span class="plan-badge badge-pro" id="proBadge">VIP priority</span>
+        </div>
+        <div class="price-right">
+          <div class="price-num" id="proPrice"></div>
+          <div class="price-period" id="proPeriod"></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <ul class="feats" id="proFeats"></ul>
+      <div class="pay-wrap" id="proBtns"></div>
+      <div class="note" id="proNote"></div>
     </div>
+
+    <!-- BIT INSTALL -->
+    <div class="bit-install" id="bitInstall">
+      <div class="bit-install-icon">📱</div>
+      <div class="bit-install-title" id="bitInstallTitle">Bit not installed?</div>
+      <a href="https://bit.co.il/download" target="_blank" class="install-link" id="bitInstallBtn">Download Bit</a>
+    </div>
+
   </div>
-</div>
 
-<script>
-const tg = window.Telegram && window.Telegram.WebApp;
-if (tg) tg.ready();
+  <script>
+  (function () {
+    "use strict";
 
-// Цены ILS: 1мес / 6мес / 12мес
-const P = {
-  1:  {s: 99,  p: 149},
-  6:  {s: 499, p: 749},
-  12: {s: 849, p: 1349}
-};
-// Скидки в числах
-const SAVE_S = {6: 95,  12: 189};  // экономия STANDARD
-const SAVE_P = {6: 145, 12: 439};  // экономия PRO
-const PL = {1:'в месяц', 6:'итого за 6 мес', 12:'итого за год'};
+    const tg = window.Telegram && window.Telegram.WebApp;
+    if (tg) tg.ready();
 
-let per = 1;
+    // ── ВАЛЮТА из URL параметра ──────────────────────────────────────────
+    const urlParams  = new URLSearchParams(window.location.search);
+    const currency   = (urlParams.get("currency") || "USD").toUpperCase();
+    const isILS      = currency === "ILS";
 
-const BIT_NUMBER = '053-924-0508';
-const BIT_RAW    = '0539240508';
-const PP_URL     = 'https://paypal.me/istudio3377';
-const BIT_DEEPLINK = 'https://bitpay.co.il/app/pay?phone=' + BIT_RAW;
-const BIT_INSTALL_URL = 'https://bit.co.il/download'; // страница установки Bit
+    // ── ЦЕНЫ ────────────────────────────────────────────────────────────
+    const PRICES = {
+      ILS: { 1: {s:  99, p: 149}, 6: {s:  499, p:  749}, 12: {s:  849, p: 1349} },
+      USD: { 1: {s:  29, p:  49}, 6: {s:  139, p:  249}, 12: {s:  239, p:  449} },
+    };
 
-// Определяем язык
-let userLang = 'ru';
-if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
-  userLang = tg.initDataUnsafe.user.language_code || 'ru';
-}
+    const SAVE = {
+      ILS: { s: {6:  95, 12: 189}, p: {6: 145, 12: 439} },
+      USD: { s: {6:  35, 12: 109}, p: {6:  45, 12: 139} },
+    };
 
-const L = {
-  title:   {ru:'Тарифы Win-Win', he:'תעריפי Win-Win', en:'Win-Win Plans', ar:'خطط Win-Win'},
-  sub:     {ru:'Выбери план — и вперёд!', he:'בחרו תוכנית — ויאללה!', en:'Pick a plan and go!', ar:'اختر خطة وانطلق!'},
-  perMon:  {ru:'в месяц', he:'לחודש', en:'per month', ar:'شهريا'},
-  per6:    {ru:'итого за 6 мес', he:'סה"כ ל-6 חודשים', en:'total for 6 mo', ar:'المجموع لـ 6 أشهر'},
-  per12:   {ru:'итого за год', he:'סה"כ לשנה', en:'total for year', ar:'المجموع للسنة'},
-  stdBadge:{ru:'Популярный выбор', he:'הבחירה הפופולרית', en:'Popular choice', ar:'الخيار الشائع'},
-  proBadge:{ru:'VIP приоритет', he:'עדיפות VIP', en:'VIP priority', ar:'أولوية VIP'},
-  startSub:{ru:'первые 10 сделок бесплатно', he:'10 העסקאות הראשונות בחינם', en:'first 10 deals free', ar:'أول 10 صفقات مجانا'},
-  f1:      {ru:'Безлимитные лиды', he:'לידים ללא הגבלה', en:'Unlimited leads', ar:'عملاء غير محدودين'},
-  f2:      {ru:'Персональные QR-коды', he:'קודי QR אישיים', en:'Personal QR codes', ar:'رموز QR شخصية'},
-  f3:      {ru:'Долговая книга агентов', he:'ספר חובות סוכנים', en:'Agent debt book', ar:'دفتر ديون الوكلاء'},
-  f4:      {ru:'Экспорт сделок в CSV', he:'ייצוא עסקאות ל-CSV', en:'Export deals to CSV', ar:'تصدير الصفقات CSV'},
-  f5:      {ru:'Поддержка Винса 24/7', he:'תמיכת וינס 24/7', en:'Vince support 24/7', ar:'دعم فينس 24/7'},
-  fp1:     {ru:'Всё из STANDARD', he:'הכל מ-STANDARD', en:'All from STANDARD', ar:'كل شيء من STANDARD'},
-  fp2:     {ru:'Топ позиции в каталоге', he:'מיקומי טופ בקטלוג', en:'Top catalog positions', ar:'مواقع متصدرة'},
-  fp3:     {ru:'Значок верификации ✅', he:'תג אימות ✅', en:'Verification badge ✅', ar:'شارة التحقق ✅'},
-  fp4:     {ru:'Приоритетная поддержка Винса', he:'תמיכת וינס עדיפה', en:'Priority Vince support', ar:'دعم فينس ذو أولوية'},
-  bitBtn:  {ru:'📱 Оплатить через Bit', he:'📱 לשלם דרך Bit', en:'📱 Pay via Bit', ar:'📱 الدفع عبر Bit'},
-  ppBtn:   {ru:'Оплатить через PayPal', he:'לשלם דרך PayPal', en:'Pay via PayPal', ar:'الدفع عبر PayPal'},
-  copyHint:{ru:'Но сначала скопируйте номер:', he:'אך קודם העתיקו את המספר:', en:'But first copy the number:', ar:'لكن أولاً انسخ الرقم:'},
-  copyBtn: {ru:'Скопировать номер', he:'העתק מספר', en:'Copy number', ar:'نسخ الرقم'},
-  copied:  {ru:'Скопировано!', he:'הועתק!', en:'Copied!', ar:'تم النسخ!'},
-  noteILS: {ru:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>После оплаты подписка активируется в течение часа',
-            he:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>לאחר התשלום המנוי יופעל תוך שעה',
-            en:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>Subscription activates within 1 hour after payment',
-            ar:'Bit 053-924-0508 · PayPal paypal.me/istudio3377<br>يتم تفعيل الاشتراك خلال ساعة بعد الدفع'},
-};
+    const SYM = isILS ? "₪" : "$";
+    const P   = PRICES[isILS ? "ILS" : "USD"];
+    const SAV = SAVE[isILS ? "ILS" : "USD"];
 
-function t(key) { return L[key][userLang] || L[key]['en'] || ''; }
+    // ── ПЛАТЁЖНЫЕ РЕКВИЗИТЫ ─────────────────────────────────────────────
+    const BIT_NUMBER   = "053-924-0508";
+    const BIT_RAW      = "0539240508";
+    const BIT_DEEPLINK = "https://bitpay.co.il/app/pay?phone=" + BIT_RAW;
+    const PP_URL       = "https://paypal.me/istudio3377";
 
-function copyBitNumber(btn) {
-  const copied = t('copied');
-  const orig   = t('copyBtn');
-  navigator.clipboard.writeText(BIT_RAW).then(() => {
-    btn.textContent = copied;
-    setTimeout(() => btn.textContent = orig, 2000);
-  }).catch(() => {
-    const ta = document.createElement('textarea');
-    ta.value = BIT_RAW;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    btn.textContent = copied;
-    setTimeout(() => btn.textContent = orig, 2000);
-  });
-}
+    // ── ЯЗЫК ────────────────────────────────────────────────────────────
+    let userLang = "en";
+    if (tg && tg.initDataUnsafe && tg.initDataUnsafe.user) {
+      const lc = tg.initDataUnsafe.user.language_code || "en";
+      if (lc.startsWith("he") || lc.startsWith("iw")) userLang = "he";
+      else if (lc.startsWith("ar"))                   userLang = "ar";
+      else if (lc.startsWith("ru"))                   userLang = "ru";
+    }
 
-function renderBtns(id, plan) {
-  const el    = document.getElementById(id);
-  const price = plan === 'STANDARD' ? P[per].s : P[per].p;
-  const label = per === 1 ? '1 мес' : per === 6 ? '6 мес' : '12 мес';
-  const ppUrl = `${PP_URL}/${price}ILS`;
+    const isRtl = userLang === "he" || userLang === "ar";
+    if (isRtl) { document.body.classList.add("rtl"); }
+    document.documentElement.lang = userLang;
 
-  el.innerHTML = `
-    <div style="width:100%;display:flex;flex-direction:column;gap:8px">
-      <button class="pay-btn green" style="width:100%" onclick="openBit('${plan}','${label}','${price}')">${t('bitBtn')}</button>
-      <div class="bit-box">
-        <div style="font-size:11px;color:#555;margin-bottom:4px">${t('copyHint')}</div>
-        <div class="bit-num">${BIT_NUMBER}</div>
-        <button class="copy-btn" onclick="copyBitNumber(this)">${t('copyBtn')}</button>
-      </div>
-      <a href="${ppUrl}" target="_blank" style="text-decoration:none" onclick="notifyBot('${plan}','${label}','${price}ILS','PayPal')">
-        <button class="pay-btn blue" style="width:100%">${t('ppBtn')}</button>
-      </a>
-    </div>`;
-}
+    // ── ТЕКСТЫ ──────────────────────────────────────────────────────────
+    const L = {
+      title:      {ru:"Тарифы Win-Win",        he:"תעריפי Win-Win",        en:"Win-Win Plans",       ar:"خطط Win-Win"},
+      sub:        {ru:"Выбери план — и вперёд!",he:"בחרו תוכנית — ויאללה!", en:"Pick a plan and go!", ar:"اختر خطة وانطلق!"},
+      per1:       {ru:"1 мес",   he:"1 חודש",  en:"1 mo",  ar:"1 شهر"},
+      per6:       {ru:"6 мес",   he:"6 חודשים",en:"6 mo",  ar:"6 أشهر"},
+      per12:      {ru:"12 мес",  he:"12 חודשים",en:"12 mo", ar:"12 شهراً"},
+      perMon:     {ru:"в месяц", he:"לחודש",   en:"per month",       ar:"شهريا"},
+      per6lbl:    {ru:"итого за 6 мес", he:'סה"כ ל-6 חודשים', en:"total for 6 mo",   ar:"المجموع لـ 6 أشهر"},
+      per12lbl:   {ru:"итого за год",   he:'סה"כ לשנה',       en:"total for year",   ar:"المجموع للسنة"},
+      stdBadge:   {ru:"Популярный выбор", he:"הבחירה הפופולרית", en:"Popular choice", ar:"الخيار الشائع"},
+      proBadge:   {ru:"VIP приоритет",    he:"עדיפות VIP",       en:"VIP priority",   ar:"أولوية VIP"},
+      startSub:   {ru:"первые 10 сделок бесплатно", he:"10 העסקאות הראשונות בחינם", en:"first 10 deals free", ar:"أول 10 صفقات مجانا"},
+      bitBtn:     {ru:"📱 Оплатить через Bit",  he:"📱 לשלם דרך Bit",  en:"📱 Pay via Bit",   ar:"📱 الدفع عبر Bit"},
+      ppBtn:      {ru:"Оплатить через PayPal", he:"לשלם דרך PayPal", en:"Pay via PayPal",  ar:"الدفع عبر PayPal"},
+      copyHint:   {ru:"Сначала скопируйте номер:", he:"קודם העתיקו את המספר:", en:"First copy the number:", ar:"أولاً انسخ الرقم:"},
+      copyBtn:    {ru:"Скопировать номер", he:"העתק מספר", en:"Copy number", ar:"نسخ الرقم"},
+      copied:     {ru:"Скопировано!",      he:"הועתק!",    en:"Copied!",     ar:"تم النسخ!"},
+      noteILS:    {
+        ru:"После оплаты подписка активируется в течение часа",
+        he:"לאחר התשלום המנוי יופעל תוך שעה",
+        en:"Subscription activates within 1 hour after payment",
+        ar:"يتم تفعيل الاشتراك خلال ساعة بعد الدفع"
+      },
+      noteUSD:    {
+        ru:"PayPal: paypal.me/istudio3377 · Активация в течение часа",
+        he:"PayPal: paypal.me/istudio3377 · הפעלה תוך שעה",
+        en:"PayPal: paypal.me/istudio3377 · Activates within 1 hour",
+        ar:"PayPal: paypal.me/istudio3377 · التفعيل خلال ساعة"
+      },
+      installTitle:{ru:"Bit не установлен? Скачайте бесплатно:", he:"Bit לא מותקן? הורידו בחינם:", en:"Bit not installed? Download free:", ar:"Bit غير مثبت؟ حمّل مجاناً:"},
+      installBtn:  {ru:"Установить Bit", he:"הורד Bit", en:"Download Bit", ar:"حمّل Bit"},
+      f: {
+        1:{ru:"Безлимитные лиды",          he:"לידים ללא הגבלה",    en:"Unlimited leads",        ar:"عملاء غير محدودين"},
+        2:{ru:"Персональные QR-коды",       he:"קודי QR אישיים",     en:"Personal QR codes",      ar:"رموز QR شخصية"},
+        3:{ru:"Долговая книга агентов",     he:"ספר חובות סוכנים",   en:"Agent debt book",        ar:"دفتر ديون الوكلاء"},
+        4:{ru:"Экспорт сделок в CSV",       he:"ייצוא עסקאות ל-CSV", en:"Export deals to CSV",    ar:"تصدير الصفقات CSV"},
+        5:{ru:"Поддержка Винса 24/7",       he:"תמיכת וינס 24/7",    en:"Vince support 24/7",     ar:"دعم فينس 24/7"},
+      },
+      fp: {
+        1:{ru:"Всё из STANDARD",                he:"הכל מ-STANDARD",       en:"All from STANDARD",          ar:"كل شيء من STANDARD"},
+        2:{ru:"Топ позиции в каталоге",         he:"מיקומי טופ בקטלוג",    en:"Top catalog positions",      ar:"مواقع متصدرة في الكتالوج"},
+        3:{ru:"Значок верификации ✅",           he:"תג אימות ✅",           en:"Verification badge ✅",       ar:"شارة التحقق ✅"},
+        4:{ru:"Приоритетная поддержка Винса",   he:"תמיכת וינס עדיפה",     en:"Priority Vince support",     ar:"دعم فينس ذو أولوية"},
+      },
+    };
 
-function render() {
-  document.querySelector('.hero h1').textContent = t('title');
-  document.querySelector('.hero p').textContent  = t('sub');
+    function t(key)    { return (L[key] && (L[key][userLang] || L[key].en)) || ""; }
+    function tf(k, n)  { return (L[k][n] && (L[k][n][userLang] || L[k][n].en)) || ""; }
 
-  const v = P[per];
-  document.getElementById('std-p').textContent   = '₪' + v.s;
-  document.getElementById('std-sub').textContent = per === 1 ? t('perMon') : per === 6 ? t('per6') : t('per12');
-  document.getElementById('pro-p').textContent   = '₪' + v.p;
-  document.getElementById('pro-sub').textContent = per === 1 ? t('perMon') : per === 6 ? t('per6') : t('per12');
+    // ── СОСТОЯНИЕ ───────────────────────────────────────────────────────
+    let per = 1;
 
-  // Скидки в числах (сколько экономишь)
-  if (per > 1) {
-    document.getElementById('s6').textContent  = '-' + SAVE_S[6]  + '₪';
-    document.getElementById('s12').textContent = '-' + SAVE_S[12] + '₪';
-  }
+    // ── ВСПОМОГАЛКИ ─────────────────────────────────────────────────────
+    function dot(type) {
+      const cls   = type === "std" ? "dot-std" : "dot-pro";
+      const color = type === "std" ? "#00d4aa" : "#6c63ff";
+      return `<span class="dot ${cls}"><svg width="8" height="8" viewBox="0 0 8 8"><polyline points="1,4 3,6 7,2" stroke="${color}" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg></span>`;
+    }
 
-  renderBtns('std-btns', 'STANDARD');
-  renderBtns('pro-btns', 'PRO');
+    function copyNum(btn) {
+      const orig = t("copyBtn");
+      navigator.clipboard.writeText(BIT_RAW).then(() => {
+        btn.textContent = t("copied");
+        setTimeout(() => btn.textContent = orig, 2000);
+      }).catch(() => {
+        const ta = document.createElement("textarea");
+        ta.value = BIT_RAW;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        btn.textContent = t("copied");
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    }
 
-  // Локализуем блок установки Bit
-  const installTexts = {
-    ru: 'Bit не установлен? Скачайте бесплатно:',
-    he: 'Bit לא מותקן? הורידו בחינם:',
-    en: 'Bit not installed? Download free:',
-    ar: 'Bit غير مثبت؟ حمّل مجاناً:'
-  };
-  const installEl = document.getElementById('bit-install-text');
-  if (installEl) installEl.textContent = installTexts[userLang] || installTexts.en;
-  document.getElementById('pay-note').innerHTML = '<strong>' + (t('noteILS')) + '</strong>';
-}
+    window._copyNum = copyNum;
 
-function setPer(p) {
-  per = p;
-  document.querySelectorAll('.per-btn').forEach((b, i) => {
-    b.classList.toggle('active', i === {1:0,6:1,12:2}[p]);
-  });
-  render();
-}
+    function openBit(plan, price) {
+      notifyBot(plan, SYM + price, "Bit");
+      window.open(BIT_DEEPLINK, "_blank");
+      setTimeout(() => {
+        document.getElementById("bitInstall").style.display = "block";
+      }, 2000);
+    }
+    window._openBit = openBit;
 
-function openBit(plan, label, price) {
-  notifyBot(plan, label, price + 'ILS', 'Bit');
-  // Пробуем открыть Bit, если не открылось — предлагаем установить
-  const tryOpen = window.open(BIT_DEEPLINK, '_blank');
-  setTimeout(() => {
-    // Если окно не открылось или пользователь вернулся — показываем кнопку установки
-    const installMsg = document.getElementById('bit-install-msg');
-    if (installMsg) installMsg.style.display = 'block';
-  }, 2000);
-}
+    function notifyBot(plan, price, method) {
+      launchCoins();
+      setTimeout(() => {
+        if (tg) tg.sendData(JSON.stringify({ action: "pay_intent", plan, price, method }));
+      }, 800);
+    }
 
-function notifyBot(plan, period, price, method) {
-  launchCoins();
-  setTimeout(() => {
-    if (tg) tg.sendData(JSON.stringify({action:'pay_intent', plan, period, price, method}));
-  }, 800);
-}
+    function launchCoins() {
+      const coins = ["🪙","💰","💵","🤑","✨","⭐"];
+      for (let i = 0; i < 28; i++) {
+        setTimeout(() => {
+          const el = document.createElement("div");
+          el.textContent = coins[Math.floor(Math.random() * coins.length)];
+          el.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-40px;font-size:${20+Math.random()*18}px;z-index:9999;pointer-events:none;animation:coinFall ${1.2+Math.random()*1.2}s ease-in forwards;`;
+          document.body.appendChild(el);
+          setTimeout(() => el.remove(), 2500);
+        }, i * 60);
+      }
+    }
 
-function launchCoins() {
-  const coins = ['🪙','💰','💵','🤑','✨','⭐'];
-  for (let i = 0; i < 28; i++) {
-    setTimeout(() => {
-      const el = document.createElement('div');
-      el.textContent = coins[Math.floor(Math.random() * coins.length)];
-      el.style.cssText = `
-        position:fixed;
-        left:${Math.random()*100}vw;
-        top:-40px;
-        font-size:${20 + Math.random()*18}px;
-        z-index:9999;
-        pointer-events:none;
-        animation:coinFall ${1.2 + Math.random()*1.2}s ease-in forwards;
-      `;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), 2500);
-    }, i * 60);
-  }
-}
+    const cs = document.createElement("style");
+    cs.textContent = `@keyframes coinFall{0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1}80%{opacity:1}100%{transform:translateY(105vh) rotate(720deg) scale(0.6);opacity:0}}`;
+    document.head.appendChild(cs);
 
-const coinStyle = document.createElement('style');
-coinStyle.textContent = `
-@keyframes coinFall {
-  0%   { transform: translateY(0) rotate(0deg) scale(1); opacity:1; }
-  80%  { opacity:1; }
-  100% { transform: translateY(105vh) rotate(${Math.random()>0.5?'':'-'}720deg) scale(0.6); opacity:0; }
-}`;
-document.head.appendChild(coinStyle);
+    // ── РЕНДЕР КНОПОК ───────────────────────────────────────────────────
+    function renderBtns(elId, plan) {
+      const el    = document.getElementById(elId);
+      const price = plan === "STANDARD" ? P[per].s : P[per].p;
+      const ppUrl = `${PP_URL}/${price}${isILS ? "ILS" : "USD"}`;
 
-render();
-</script>
+      if (isILS) {
+        // ILS: Bit + PayPal
+        el.innerHTML = `
+          <button class="pay-btn green" onclick="_openBit('${plan}', ${price})">${t("bitBtn")}</button>
+          <div class="bit-box">
+            <div class="bit-hint">${t("copyHint")}</div>
+            <div class="bit-num">${BIT_NUMBER}</div>
+            <button class="copy-btn" onclick="_copyNum(this)">${t("copyBtn")}</button>
+          </div>
+          <a href="${ppUrl}" target="_blank" style="text-decoration:none" onclick="notifyBot('${plan}','${SYM}${price}','PayPal')">
+            <button class="pay-btn blue" style="width:100%">${t("ppBtn")}</button>
+          </a>`;
+      } else {
+        // USD: только PayPal
+        el.innerHTML = `
+          <a href="${ppUrl}" target="_blank" style="text-decoration:none" onclick="notifyBot('${plan}','${SYM}${price}','PayPal')">
+            <button class="pay-btn blue" style="width:100%">${t("ppBtn")}</button>
+          </a>`;
+      }
+    }
+
+    // ── РЕНДЕР ФИЧЕЙ ────────────────────────────────────────────────────
+    function renderFeats() {
+      document.getElementById("stdFeats").innerHTML =
+        [1,2,3,4,5].map(n => `<li>${dot("std")}${tf("f", n)}</li>`).join("");
+      document.getElementById("proFeats").innerHTML =
+        [1,2,3,4].map(n => `<li>${dot("pro")}${tf("fp", n)}</li>`).join("");
+    }
+
+    // ── ГЛАВНЫЙ РЕНДЕР ──────────────────────────────────────────────────
+    function render() {
+      document.getElementById("pageTitle").textContent  = t("title");
+      document.getElementById("pageSub").textContent    = t("sub");
+      document.getElementById("startSub").textContent   = t("startSub");
+      document.getElementById("stdBadge").textContent   = t("stdBadge");
+      document.getElementById("proBadge").textContent   = t("proBadge");
+      document.getElementById("bitInstallTitle").textContent = t("installTitle");
+      document.getElementById("bitInstallBtn").textContent   = t("installBtn");
+
+      // Кнопки периодов
+      document.getElementById("per1").childNodes[0].textContent  = t("per1");
+      document.getElementById("per6").childNodes[0].textContent  = t("per6");
+      document.getElementById("per12").childNodes[0].textContent = t("per12");
+
+      const v = P[per];
+      const perLbl = per === 1 ? t("perMon") : per === 6 ? t("per6lbl") : t("per12lbl");
+
+      document.getElementById("stdPrice").textContent  = SYM + v.s;
+      document.getElementById("stdPeriod").textContent = perLbl;
+      document.getElementById("proPrice").textContent  = SYM + v.p;
+      document.getElementById("proPeriod").textContent = perLbl;
+
+      // Скидки
+      if (per > 1) {
+        document.getElementById("s6").textContent  = "-" + SYM + SAV.s[6];
+        document.getElementById("s12").textContent = "-" + SYM + SAV.s[12];
+      } else {
+        document.getElementById("s6").textContent  = "";
+        document.getElementById("s12").textContent = "";
+      }
+
+      renderFeats();
+      renderBtns("stdBtns", "STANDARD");
+      renderBtns("proBtns", "PRO");
+
+      const noteText = isILS ? t("noteILS") : t("noteUSD");
+      document.getElementById("stdNote").textContent = noteText;
+      document.getElementById("proNote").textContent = noteText;
+    }
+
+    // ── СМЕНА ПЕРИОДА ───────────────────────────────────────────────────
+    window.setPer = function(p) {
+      per = p;
+      document.querySelectorAll(".per-btn").forEach((b, i) => {
+        b.classList.toggle("active", i === {1:0,6:1,12:2}[p]);
+      });
+      render();
+    };
+
+    // ── ЗАПУСК ──────────────────────────────────────────────────────────
+    render();
+
+  })();
+  </script>
 </body>
 </html>
