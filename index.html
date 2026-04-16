@@ -412,9 +412,19 @@
       font-weight: 700;
       text-decoration: none;
     }
+    .lang-bar { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+    .lang-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); border-radius: 999px; color: rgba(255,255,255,0.4); font-family: inherit; font-size: 0.75rem; font-weight: 700; padding: 5px 13px; cursor: pointer; transition: all 0.18s; }
+    .lang-btn.active { background: linear-gradient(135deg, rgba(108,99,255,0.25), rgba(0,212,170,0.12)); border-color: rgba(108,99,255,0.6); color: #fff; }
+    .lang-btn:hover:not(.active) { border-color: rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); }
   </style>
 </head>
 <body>
+  <div class="lang-bar" id="langBar">
+    <button class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" data-lang="he" onclick="setLang('he')">עב</button>
+    <button class="lang-btn" data-lang="ar" onclick="setLang('ar')">عر</button>
+    <button class="lang-btn" data-lang="ru" onclick="setLang('ru')">РУ</button>
+  </div>
   <div class="shell">
 
     <div class="header">
@@ -526,6 +536,8 @@
       else if (lc.startsWith("ar"))                   userLang = "ar";
       else if (lc.startsWith("ru"))                   userLang = "ru";
     }
+    const lang = userLang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === userLang || b.dataset.lang === lang));
 
     const isRtl = userLang === "he" || userLang === "ar";
     if (isRtl) { document.body.classList.add("rtl"); }
@@ -572,7 +584,7 @@
       },
       fp: {
         1:{ru:"Всё из STANDARD",                he:"הכל מ-STANDARD",       en:"All from STANDARD",          ar:"كل شيء من STANDARD"},
-        2:{ru:"Топ позиции в каталоге",         he:"מיקומי טופ בקטלוג",    en:"Top catalog positions",      ar:"مواقع متصدرة في الكتالوج"},
+        2:{ru:"Расширенная аналитика + доступ к топу рекомендателей", he:"אנליטיקה מורחבת + גישה למובילי ממליצים", en:"Advanced analytics + access to top recommenders", ar:"تحليلات متقدمة + وصول إلى أفضل الموصين"},
         3:{ru:"Значок верификации ✅",           he:"תג אימות ✅",           en:"Verification badge ✅",       ar:"شارة التحقق ✅"},
         4:{ru:"Приоритетная поддержка Винса",   he:"תמיכת וינס עדיפה",     en:"Priority Vince support",     ar:"دعم فينس ذو أولوية"},
       },
@@ -732,6 +744,14 @@
 
     // ── ЗАПУСК ──────────────────────────────────────────────────────────
     render();
+
+    window.setLang = function(lang) {
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === userLang || b.dataset.lang === lang));
+      userLang = lang;
+      document.body.classList.toggle("rtl", userLang === "he" || userLang === "ar");
+      document.documentElement.lang = userLang;
+      render();
+    };
 
   })();
   </script>
